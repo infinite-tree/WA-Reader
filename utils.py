@@ -29,6 +29,14 @@ def _get_parsed_line(input_line, persons_list):
     if not text_string:
         return None, persons_list
 
+    photo_name = ""
+    if "(file attached)" in text_string:
+        parts = text_string.split()
+        if parts[0].lower().endswith(".jpg"):
+            photo_name = parts[0]
+            text_string = text_string.replace(" (file attached)", "")
+            text_string = text_string.replace(photo_name, "")
+
     user_name = items[0]
     if user_name and user_name not in persons_list:
         persons_list.append(user_name)
@@ -36,6 +44,7 @@ def _get_parsed_line(input_line, persons_list):
         "t": timestamp_string,
         "p": text_string,
         "i": persons_list.index(user_name),
+        "j": photo_name
     }
     return obj, persons_list
 

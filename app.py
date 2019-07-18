@@ -1,7 +1,12 @@
 import os
 import uuid
+import zipfile
 
-from flask import Flask, request, render_template, jsonify
+from flask import (Flask,
+                   request,
+                   render_template,
+                   jsonify,
+                   send_from_directory)
 
 from utils import get_parsed_file
 
@@ -14,9 +19,20 @@ def parse_file():
     filename = str(uuid.uuid4())
     tmp_filepath = os.path.join("conversations", filename)
     file.save(tmp_filepath)
+    conversation = ""
+    if zipfile.is_zipfile(tmp_filepath):
+        conversation = filename
+        with zipfile.ZipFile(tmp_filepath) as z:
+            conv_path = os.path.join("conversations", filename)
+            z.extractall(conv_path)
+            for p in os.listdir(conv_path):
+                if p.endswith(".txt"):
+                    tmp_filepath = os.path.join(conv_path, p)
+
     try:
         parsed_items, persons_list = get_parsed_file(tmp_filepath)
         response = {
+            "identifier": conversation,
             "success": True,
             "chat": parsed_items,
             "users": persons_list
@@ -34,6 +50,11 @@ def parse_file():
 @app.route('/', methods=['GET'])
 def main():
     return render_template("index.html")
+
+@app.route('/conversations/<path:path>')
+def send_js(path):
+    conversation, img = os.path.split(path)
+    return send_from_directory(os.path.join('conversations', conversation), img)
 
 
 @app.errorhandler(404)

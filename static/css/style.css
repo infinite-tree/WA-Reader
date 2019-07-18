@@ -42,7 +42,7 @@ nav .navbar-nav li a{
 .aloo{
     background-color: #FFFFFF;
     margin: 2px;
-    width: 80%;
+    width: 50%;
     -webkit-border-radius: 5px;
     -moz-border-radius: 5px;
     border-radius: 5px;
@@ -60,6 +60,15 @@ nav .navbar-nav li a{
     color: #626362;
     margin-right: 5px;
     padding: 0;
+}
+.aloo .img-holder {
+    width: auto;
+    display: inline-block;
+}
+
+.aloo .img-holder img {
+    width: 100%;
+    height: auto;
 }
 
 .new-user-block {

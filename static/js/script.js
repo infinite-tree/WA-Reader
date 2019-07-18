@@ -9,7 +9,7 @@ function submitForm (event) {
     event.preventDefault();
 
     $('#errors').html('');
-    
+
     if (typeof files != 'undefined') {
         uploadFiles(event);
     } else {
@@ -38,7 +38,7 @@ function uploadFiles(event){
         dataType: 'json',
         processData: false,
         contentType: false,
-        
+
         success: function(response){
             if(response.success){
                 upload_prompt_div.hide();
@@ -50,7 +50,7 @@ function uploadFiles(event){
                 for(var chat_index in response.chat){
                     var chat_div_id = "chatBox" + chat_index,
                         chat_user_index = response.chat[chat_index].i,
-                        chat_html = '<div class="aloo" id="'+ chat_div_id +'"><div class="user"></div><div class="text"></div><div class="time"></div></div>';
+                        chat_html = '<div class="aloo" id="' + chat_div_id + '"><div class="user"></div><div class="img-holder"><img src=""></div><div class="text"></div><div class="time"></div></div><br>';
 
                     chat_div.append(chat_html);
                     if (chat_user_index == 1)
@@ -61,6 +61,9 @@ function uploadFiles(event){
                         $("#" + chat_div_id).addClass("new-user-block");
                     }
 
+                    if (response.chat[chat_index].j != "") {
+                        $("img", "#" + chat_div_id).attr("src", "/conversations/" + response.identifier + "/" + response.chat[chat_index].j);
+                    }
                     $("div.text", "#" + chat_div_id).text(response.chat[chat_index].p);
                     $("div.time", "#" + chat_div_id).text(response.chat[chat_index].t);
                     last_user_index = chat_user_index;
@@ -72,7 +75,7 @@ function uploadFiles(event){
         error: function(jqXHR, textStatus, errorThrown){
             error_message = 'Some technical glitch! Please retry after reloading the page!';
             show_error_message(error_message);
-        }, 
+        },
         beforeSend: function(){
             submit_button.val('Getting Conversation...');
             submit_button.attr('disabled', '');
@@ -92,7 +95,7 @@ function uploadFiles(event){
 
 function restoreForm(event) {
     event.preventDefault();
-    
+
     chat_div.empty();
     users_div.empty();
     back_nav.hide();
@@ -100,7 +103,7 @@ function restoreForm(event) {
 }
 
 
-$(document).ready(function(){    
+$(document).ready(function(){
     $('form').on('submit', submitForm);
     $('input[type=file]').on('change', prepareUpload);
     $('.nav-back').click(restoreForm);
