@@ -15,22 +15,26 @@ app = Flask(__name__)
 
 @app.route('/parse-file', methods=['POST'])
 def parse_file():
-    file = request.files['0']
-    filename = str(uuid.uuid4())
-    tmp_filepath = os.path.join("conversations", filename)
-    file.save(tmp_filepath)
-    conversation = ""
-    if zipfile.is_zipfile(tmp_filepath):
-        conversation = filename
-        with zipfile.ZipFile(tmp_filepath) as z:
-            conv_path = os.path.join("conversations", filename)
-            z.extractall(conv_path)
-            for p in os.listdir(conv_path):
+    file_obj = request.files['0']
+    conversation = str(uuid.uuid4())
+    convo_dir = os.path.join("conversations", conversation)
+    zip_filepath = convo_dir + "_zip"
+    file_obj.save(zip_filepath)
+    convo_transcript = None
+    if zipfile.is_zipfile(zip_filepath):
+        with zipfile.ZipFile(zip_filepath) as z:
+            os.mkdir(convo_dir)
+            z.extractall(convo_dir)
+            for p in os.listdir(convo_dir):
                 if p.endswith(".txt"):
-                    tmp_filepath = os.path.join(conv_path, p)
+                    convo_transcript = os.path.join(convo_dir, p)
+
+    # Assumed to have a txt file at this point
+    if convo_transcript is None:
+        return jsonify({"success": False, "error_message": "No transcript found"})
 
     try:
-        parsed_items, persons_list = get_parsed_file(tmp_filepath)
+        parsed_items, persons_list = get_parsed_file(convo_transcript)
         response = {
             "identifier": conversation,
             "success": True,
@@ -43,7 +47,6 @@ def parse_file():
             "error_message": str(e)
         }
 
-    os.remove(tmp_filepath)
     return jsonify(response), 200
 
 

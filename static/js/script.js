@@ -31,6 +31,11 @@ function uploadFiles(event){
     });
 
     $.ajax({
+        statusCode: {
+            500: function() {
+                alert("Something went wrong. Please reach out to Ryan");
+            }
+        },
         url: '/parse-file',
         type: 'POST',
         data: data,

@@ -1,0 +1,14 @@
+ [Unit]
+ Description=WA-Reader Service
+ After=multi-user.target
+
+ [Service]
+ Type=idle
+ ExecStart=/usr/bin/env IS_PROD=1 gunicorn -b 0.0.0.0:5801 -w 1 app:app
+ User=root
+ Group=root
+ Restart=always
+
+ [Install]
+ WantedBy=multi-user.target
+
