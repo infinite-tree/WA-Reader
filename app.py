@@ -1,4 +1,5 @@
 import os
+import shutil
 import uuid
 import zipfile
 
@@ -25,13 +26,21 @@ def parse_file():
         with zipfile.ZipFile(zip_filepath) as z:
             os.mkdir(convo_dir)
             z.extractall(convo_dir)
+            
+            # Macs auto-unzip the file and then rezipping htem creates an extra subdir
+            subdirs = [p for p in os.listdir(convo_dir) if p.startswith("drive-download")]
+            if subdirs:
+                subdir = os.path.join(convo_dir, subdirs[0])
+                for f in os.listdir(subdir):
+                    shutil.move(os.path.join(subdir, f), os.path.join(convo_dir, f))
+
             for p in os.listdir(convo_dir):
                 if p.endswith(".txt"):
                     convo_transcript = os.path.join(convo_dir, p)
 
     # Assumed to have a txt file at this point
     if convo_transcript is None:
-        return jsonify({"success": False, "error_message": "No transcript found"})
+        return jsonify({"success": False, "error_message": "No transcript found"}), 200
 
     try:
         parsed_items, persons_list = get_parsed_file(convo_transcript)

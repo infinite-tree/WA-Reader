@@ -1,7 +1,8 @@
 function show_error_message(error_message){
-    var error_div = $('#error_message_box p');
-    error_div.text(error_message);
-    error_div.removeClass('hidden');
+    var error_box = $("#error_message_box");
+    var error_txt = $('#error_message_box p');
+    error_txt.text(error_message);
+    error_box.removeClass('hidden');
 }
 
 function submitForm (event) {
@@ -45,6 +46,9 @@ function uploadFiles(event){
         contentType: false,
 
         success: function(response){
+            console.log("was sucessful? ");
+            console.log(response);
+            console.log(response.success);
             if(response.success){
                 upload_prompt_div.hide();
                 back_nav.show();
